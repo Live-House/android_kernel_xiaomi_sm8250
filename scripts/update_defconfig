@@ -11,11 +11,13 @@ declare -g use_llvm=0
 export krnl_top
 export krnl_config_dir
 
+declare -g clang="$HOME/android/aosp-clang/bin"
+
 # Set compiler PATH
-if [[ -d $HOME/clang/bin ]]; then
-	PATH=$HOME/clang/bin:$PATH
+if [[ -d $clang ]]; then
+	PATH=$clang:$PATH
 	use_llvm=1
-	echo "Using Clang from $HOME/clang/bin"
+	echo "Using Clang from $clang"
 elif command -v clang >/dev/null 2>&1; then
 	use_llvm=1
 	echo "Using Clang from $(command -v clang)"
@@ -27,7 +29,7 @@ export base_build_cmd
 cd "$krnl_top" || exit
 
 # These values must be changed for forks!
-declare -r krnl_defconfig_url="https://github.com/UtsavBalar1231/kernel_xiaomi_sm8250"
+declare -r krnl_defconfig_url="https://github.com/Live-House/android_kernel_xiaomi_sm8250"
 declare -r krnl_defconfig_head=$(git -C "${krnl_config_dir}" rev-parse HEAD)
 
 declare -r soc="kona"
@@ -63,8 +65,7 @@ run_merge_config() {
 	ret=$(ARCH=arm64 LLVM=$use_llvm scripts/kconfig/merge_config.sh \
 		-O "${out_dir}" \
 		"${krnl_config_dir}/../${soc}-perf_defconfig" \
-		"${krnl_config_dir}/xiaomi-${soc}-common.config" \
-		"${krnl_config_dir}/${soc}-custom.config" \
+		"${krnl_config_dir}/sm8250-common.config" \
 		"${krnl_config_dir}/${device}.config")
 
 	case "$ret" in
@@ -106,6 +107,7 @@ if [[ -n $1 ]]; then
 		krnl_commit_msg=$(
 			cat <<EOM
 ARM64: configs: ${DEVICE}: update auto-generated defconfig for ${DEVICE}
+
 This update is generated automatically by using the update_defconfig script
 HEAD of the project used to prepare this commit:
 ${krnl_defconfig_url}/tree/${krnl_defconfig_head}
@@ -116,6 +118,7 @@ else
 	krnl_commit_msg=$(
 		cat <<EOM
 ARM64: configs: xiaomi: update auto-generated defconfig for all devices
+
 This update is generated automatically by using the update_defconfig script
 HEAD of the project used to prepare this commit:
 ${krnl_defconfig_url}/tree/${krnl_defconfig_head}
