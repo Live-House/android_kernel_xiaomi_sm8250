@@ -65,6 +65,7 @@ run_merge_config() {
 	ret=$(ARCH=arm64 LLVM=$use_llvm scripts/kconfig/merge_config.sh \
 		-O "${out_dir}" \
 		"${krnl_config_dir}/../${soc}-perf_defconfig" \
+		"${krnl_config_dir}/../debugfs.config" \
 		"${krnl_config_dir}/sm8250-common.config" \
 		"${krnl_config_dir}/${device}.config")
 
