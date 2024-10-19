@@ -27,8 +27,6 @@ LOCALVERSION=$(sed -n 's/^.*CONFIG_LOCALVERSION="\([^"]*\)".*$/\1/p' arch/arm64/
 zipname="AnyKernel3-${DEVICE}${LOCALVERSION}-${DATE}.zip"
 
 function Build() {
-	START=$(date +"%s")
-
 	if ! [ -d "${CLANG_DIR}" ]; then
 		echo "aosp clang not found! Cloning..."
 		if ! git clone -q https://gitlab.com/ThankYouMario/android_prebuilts_clang-standalone.git --depth=1 $CLANG_DIR; then
@@ -97,10 +95,6 @@ function Build() {
 	git checkout arch/arm64/boot/dts/vendor &>/dev/null
 
 	echo "------ Finishing Build ------"
-
-	END=$(date +"%s")
-	DIFF=$((END - START))
-	echo "Took $DIFF second(s) !"
 }
 
 function AnyKernel3() {
@@ -127,9 +121,10 @@ function AnyKernel3() {
 	zip -r9 "../${zipname}" ./* -x '*.git*' README.md ./*placeholder >>/dev/null
 	cd ..
 	rm -rf ak3-tmp
-	echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
 	echo -e "\n${zipname} is ready!"
 }
 
 Build "$@"
 AnyKernel3
+
+echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
